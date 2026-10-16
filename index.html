@@ -111,12 +111,38 @@ h1,h2,h3{margin:0;font-weight:600;letter-spacing:-.01em}
 .rig{position:relative;margin:0;height:460px;border:1px solid var(--night-line);border-radius:var(--r-lg);background:var(--night2);overflow:hidden}
 .rig .grid{position:absolute;inset:0;background-image:linear-gradient(#2B1415 1px,transparent 1px),linear-gradient(90deg,#2B1415 1px,transparent 1px);background-size:32px 32px}
 .rig .axis{position:absolute;left:28px;right:28px;top:50%;border-top:1px dashed #4A2628}
-.rig .logo{position:absolute;left:50%;top:50%;width:220px;height:220px;margin:-110px 0 0 -110px;border-radius:48px;box-shadow:0 30px 60px rgba(0,0,0,.45);animation:lift 6s ease-in-out infinite}
-@keyframes lift{0%,100%{transform:translateY(8px)}50%{transform:translateY(-10px)}}
+.rig .logo{position:absolute;left:50%;top:50%;width:220px;height:220px;margin:-110px 0 0 -110px;z-index:2;animation:hoist 8s cubic-bezier(.45,0,.25,1) 1.3s infinite backwards}
+.rig .logo svg{display:block;width:100%;height:100%;overflow:visible;filter:drop-shadow(0 30px 34px rgba(0,0,0,.5))}
+.rig .shadow{position:absolute;left:50%;top:50%;width:200px;height:26px;margin:122px 0 0 -100px;border-radius:50%;background:radial-gradient(closest-side,rgba(0,0,0,.55),transparent);z-index:1;animation:shadow 8s cubic-bezier(.45,0,.25,1) 1.3s infinite backwards}
+@keyframes hoist{0%,100%{transform:translateY(14px)}40%,78%{transform:translateY(-18px)}}
+@keyframes shadow{0%,100%{transform:scale(1);opacity:.9}40%,78%{transform:scale(.7);opacity:.45}}
+/* the H builds itself once, then the arrow keeps nudging up */
+.lg-l,.lg-r{transform-box:fill-box;transform-origin:50% 100%;animation:leg .7s cubic-bezier(.2,.9,.3,1.2) both}
+.lg-r{animation-delay:.12s}
+.lg-h{transform-box:fill-box;transform-origin:50% 100%;animation:head .55s cubic-bezier(.2,.9,.3,1.4) .45s both}
+.lg-up{animation:nudge 8s cubic-bezier(.45,0,.25,1) 1.3s infinite}
+.lg-b{animation:bar .6s cubic-bezier(.2,.9,.3,1.1) .7s both}
+.lg-tile{animation:fade .4s ease-out both}
+@keyframes leg{from{transform:scaleY(0)}to{transform:scaleY(1)}}
+@keyframes head{from{transform:translateY(40px) scale(.4);opacity:0}to{transform:none;opacity:1}}
+@keyframes bar{from{transform:translate(-50px,30px);opacity:0}to{transform:none;opacity:1}}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+@keyframes nudge{0%,30%,100%{transform:none}40%{transform:translateY(-9px)}48%{transform:translateY(-3px)}56%{transform:translateY(-6px)}70%{transform:none}}
+/* a price line climbs behind the logo on each lift */
+.rig .run{position:absolute;inset:0;width:100%;height:100%;z-index:0}
+.rig .run path{fill:none;stroke:var(--or);stroke-width:2.5;stroke-linejoin:round;vector-effect:non-scaling-stroke;stroke-dasharray:1;stroke-dashoffset:1;animation:draw 8s cubic-bezier(.45,0,.25,1) 1.3s infinite}
+.rig .run .area{stroke:none;fill:url(#runfill);opacity:0;animation:area 8s ease 1.3s infinite}
+@keyframes draw{0%{stroke-dashoffset:1;opacity:1}42%{stroke-dashoffset:0;opacity:1}80%{stroke-dashoffset:0;opacity:1}94%,100%{stroke-dashoffset:0;opacity:0}}
+@keyframes area{0%,20%{opacity:0}45%,78%{opacity:1}94%,100%{opacity:0}}
 .rig .read{position:absolute;top:28px;display:flex;flex-direction:column;gap:4px;font-family:var(--mono)}
 .rig .read small{font-size:12px;color:var(--night-muted);letter-spacing:.08em}
 .rig .read b{font-weight:400;font-size:26px}
-.rig .read i{width:120px;border-top:1px dashed #6E4A47;margin-top:6px}
+.rig .read i{display:block;width:120px;height:4px;margin-top:8px;border-radius:2px;background:#3A1E1F;overflow:hidden}
+.rig .read i::after{content:"";display:block;height:100%;width:var(--w,100%);border-radius:2px;background:var(--c,#F2788A);transform-origin:0 50%;animation:gauge 1.4s cubic-bezier(.2,.8,.2,1) .3s both}
+.rig .read.r i{--w:52%;--c:#EAD3CF;margin-left:auto}
+.rig .read.r i::after{margin-left:auto;transform-origin:100% 50%}
+@keyframes gauge{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+.rig .read{z-index:3}.rig .foot{z-index:3}
 .rig .read.l{left:28px}.rig .read.l b{color:var(--or-light)}
 .rig .read.r{right:28px;align-items:flex-end}
 .rig .foot{position:absolute;left:28px;right:28px;bottom:26px;display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px 16px;font:400 12px var(--mono);color:var(--night-muted)}
@@ -291,7 +317,8 @@ footer{display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px;paddin
   .band .card.night{padding:24px}
 }
 @media (prefers-reduced-motion:reduce){
-  .rig .logo{animation:none}
+  .rig .logo,.rig .shadow,.lg-l,.lg-r,.lg-h,.lg-up,.lg-b,.lg-tile,.rig .read i::after{animation:none}
+  .rig .run path{animation:none;stroke-dashoffset:0}.rig .run .area{animation:none;opacity:1}
   .lever .beam,.btn,.ctile{transition:none}
 }
 </style>
@@ -332,9 +359,20 @@ footer{display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px;paddin
       <figure class="rig" aria-label="The pool, 20 SOL, outweighs the 10.40 SOL longs could win">
         <div class="grid" aria-hidden="true"></div>
         <div class="axis" aria-hidden="true"></div>
-        <img class="logo" src="logo-512.png" alt="" width="220" height="220">
-        <div class="read l" aria-hidden="true"><small>POOL</small><b>20.00 ◎</b><i></i></div>
-        <div class="read r" aria-hidden="true"><small>LONGS OWED</small><b>10.40 ◎</b><i></i></div>
+        <svg class="run" viewBox="0 0 600 460" preserveAspectRatio="none" aria-hidden="true">
+          <defs><linearGradient id="runfill" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#D12E44" stop-opacity=".28"/><stop offset="1" stop-color="#D12E44" stop-opacity="0"/></linearGradient></defs>
+          <path class="area" d="M0 400 L60 384 L105 392 L160 350 L205 362 L250 318 L300 300 L345 248 L385 262 L430 196 L470 210 L520 132 L560 146 L600 84 L600 460 L0 460 Z"/>
+          <path pathLength="1" d="M0 400 L60 384 L105 392 L160 350 L205 362 L250 318 L300 300 L345 248 L385 262 L430 196 L470 210 L520 132 L560 146 L600 84"/>
+        </svg>
+        <div class="shadow" aria-hidden="true"></div>
+        <div class="logo" aria-hidden="true"><svg viewBox="0 0 256 256">
+          <rect class="lg-tile" width="256" height="256" rx="58" fill="#2A1214" stroke="#4A2628" stroke-width="2"/>
+          <rect class="lg-l" x="45" y="88" width="44" height="120" rx="6" fill="#F6ECE8"/>
+          <g class="lg-up"><rect class="lg-r" x="149" y="96" width="44" height="112" rx="6" fill="#F6ECE8"/><polygon class="lg-h" points="131,100 171,44 211,100" fill="#F6ECE8"/></g>
+          <polygon class="lg-b" points="89,136 149,112 149,146 89,170" fill="#E0344A"/>
+        </svg></div>
+        <div class="read l" aria-hidden="true"><small>POOL</small><b data-to="20.00">20.00 ◎</b><i></i></div>
+        <div class="read r" aria-hidden="true"><small>LONGS OWED</small><b data-to="10.40">10.40 ◎</b><i></i></div>
         <figcaption class="foot"><span>MAX WIN = 3× MARGIN · RESERVED AT OPEN</span><span>EXAMPLE NUMBERS</span></figcaption>
       </figure>
     </div>
@@ -517,6 +555,18 @@ footer{display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px;paddin
   </footer>
 </div>
 <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+<script>
+(function(){ // count the hero readouts up from zero
+  if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  const els=[...document.querySelectorAll(".rig b[data-to]")], t0=performance.now()+300, dur=1400;
+  const ease=x=>1-Math.pow(1-x,3);
+  (function tick(now){
+    const p=Math.min(1,Math.max(0,(now-t0)/dur));
+    els.forEach(b=>{b.textContent=(ease(p)*+b.dataset.to).toFixed(2)+" ◎"});
+    if(p<1) requestAnimationFrame(tick);
+  })(t0);
+})();
+</script>
 <script src="brand.js"></script>
 <script src="https://leverpad-app.vercel.app/app.js" defer></script>
 <script src="https://leverpad-app.vercel.app/demo.js" defer></script>
